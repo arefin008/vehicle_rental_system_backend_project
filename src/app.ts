@@ -1,8 +1,6 @@
 import express, { Request, Response } from "express";
-// import { userRoutes } from "./modules/user/user.routes";
-// import { todoRoutes } from "./modules/todo/todo.routes";
-// import { authRoutes } from "./modules/auth/auth.routes";
 import initDB from "./config/db";
+import { userRoutes } from "./modules/user/user.routes";
 
 const app = express();
 // console.log({ pool });
@@ -20,7 +18,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 //* users CRUD
-// app.use("/users", userRoutes);
+app.use("/api/v1/users", userRoutes);
 
 //* Todos crud
 // app.use("/todos", todoRoutes);
