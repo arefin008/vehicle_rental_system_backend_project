@@ -68,6 +68,7 @@ GitHub Repository:
   1. Clone the Repository
      ```
      git clone https://github.com/arefin008/vehicle_rental_system_backend_project.git
+     cd vehicle_rental_system_backend_project
   3. Install Dependencies
      ```
      npm install
