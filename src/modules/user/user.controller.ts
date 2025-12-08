@@ -19,7 +19,6 @@ const getAllUser = async (req: Request, res: Response) => {
 };
 
 const updateUser = async (req: Request, res: Response) => {
-  // console.log(req.params.id);
   const { name, email, phone, role } = req.body;
   try {
     const result = await userServices.updateUser(
@@ -37,7 +36,7 @@ const updateUser = async (req: Request, res: Response) => {
     } else {
       res.status(200).json({
         success: true,
-        message: "User fetched successfully",
+        message: "User updated successfully",
         data: result.rows[0],
       });
     }
@@ -49,24 +48,63 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 
+// const deleteUser = async (req: Request, res: Response) => {
+//   try {
+//     const hasActiveBookings = await userServices.checkActiveBookings(
+//       req.params.customer_id!
+//     );
+//     if (hasActiveBookings) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "User cannot be deleted because they have active bookings",
+//       });
+//     }
+//     const result = await userServices.deleteUser(req.params.customer_id!);
+//     if (result.rowCount === 0) {
+//       res.status(400).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     } else {
+//       res.status(200).json({
+//         success: true,
+//         message: "User deleted successfully",
+//       });
+//     }
+//   } catch (err: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: err.message,
+//     });
+//   }
+// };
 const deleteUser = async (req: Request, res: Response) => {
   try {
-    const result = await userServices.deleteUser(req.params.id!);
-    // console.log(result);
+    const userId = req.params.id;
+
+    const hasActiveBookings = await userServices.checkActiveBookings(userId!);
+    if (hasActiveBookings) {
+      return res.status(400).json({
+        success: false,
+        message: "User cannot be deleted because they have active bookings",
+      });
+    }
+
+    const result = await userServices.deleteUser(userId!);
+
     if (result.rowCount === 0) {
-      res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: "User not found",
       });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "User deleted successfully",
-        data: result.rows,
-      });
     }
+
+    return res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+    });
   } catch (err: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message,
     });
