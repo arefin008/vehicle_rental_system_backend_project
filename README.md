@@ -66,7 +66,9 @@ GitHub Repository:
  
 - ## Setup & Installation
   1. Clone the Repository
-  2. Install Dependencies
+     ```
+     git clone https://github.com/arefin008/vehicle_rental_system_backend_project.git
+  3. Install Dependencies
      ```
      npm install
   4. Create .env File
