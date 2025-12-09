@@ -1,13 +1,14 @@
 import express from "express";
 import { vehicleControllers } from "./vehicle.controller";
+import auth from "../../middleware/auth";
 
 const router = express.Router();
 
-router.post("/", vehicleControllers.addNewVehicle);
+router.post("/", auth("admin"), vehicleControllers.addNewVehicle);
 
 router.get("/", vehicleControllers.getAllVehicle);
 router.get("/:vehicleId", vehicleControllers.getSingleVehicle),
-  router.put("/:vehicleId", vehicleControllers.updateVehicle),
-  router.delete("/:vehicleId", vehicleControllers.deleteVehicle);
+  router.put("/:vehicleId", auth("admin"), vehicleControllers.updateVehicle),
+  router.delete("/:vehicleId", auth("admin"), vehicleControllers.deleteVehicle);
 
 export const vehicleRoutes = router;

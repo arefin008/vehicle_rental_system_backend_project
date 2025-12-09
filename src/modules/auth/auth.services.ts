@@ -36,8 +36,8 @@ const loginUser = async (email: string, password: string) => {
     }
   );
   console.log({ token });
-
-  return { token, user };
+  const { password: _, ...userWithoutPassword } = user;
+  return { token, user: userWithoutPassword };
 };
 
 export const authSevices = {
