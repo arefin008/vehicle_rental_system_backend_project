@@ -67,16 +67,31 @@ const createBooking = async (payload: Record<string, unknown>) => {
   };
 };
 
-const getAllBooking = async () => {
-  const result = await pool.query(`SELECT * FROM bookings`);
-  return result;
+const getAllBooking = async (user: Record<string, any>) => {
+  let query = `SELECT * FROM bookings`;
+  let params: any[] = [];
+
+  if (user.role === "customer") {
+    query += ` WHERE customer_id = $1`;
+    params.push(user.id);
+  }
+  const result = await pool.query(query, params);
+  return result.rows;
 };
 
-const getSingleBooking = async (bookingId: string) => {
-  const result = await pool.query(`SELECT * FROM bookings WHERE id = $1`, [
-    bookingId,
+const getVehicle = async (vehicleId: number) => {
+  const res = await pool.query(
+    `SELECT vehicle_name, registration_number, type FROM vehicles WHERE id=$1`,
+    [vehicleId]
+  );
+  return res.rows[0];
+};
+
+const getCustomer = async (customerId: number) => {
+  const res = await pool.query(`SELECT name, email FROM users WHERE id=$1`, [
+    customerId,
   ]);
-  return result;
+  return res.rows[0];
 };
 
 const updateBooking = async (bookingId: string, newStatus: string) => {
@@ -145,6 +160,7 @@ const updateBooking = async (bookingId: string, newStatus: string) => {
 export const bookingServices = {
   createBooking,
   getAllBooking,
-  getSingleBooking,
+  getVehicle,
+  getCustomer,
   updateBooking,
 };

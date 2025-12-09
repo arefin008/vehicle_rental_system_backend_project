@@ -19,23 +19,50 @@ const createBooking = async (req: Request, res: Response) => {
 
 const getAllBooking = async (req: Request, res: Response) => {
   try {
-    const result = await bookingServices.getAllBooking();
-    res.status(200).json({
+    const user = req.user;
+
+    const bookings = await bookingServices.getAllBooking(user!);
+
+    const finalData = [];
+
+    for (const booking of bookings) {
+      const vehicle = await bookingServices.getVehicle(booking.vehicle_id);
+
+      const formatted: any = {
+        ...booking,
+      };
+
+      if (user?.role === "admin") {
+        formatted.customer = await bookingServices.getCustomer(
+          booking.customer_id
+        );
+      }
+
+      formatted.vehicle = {
+        vehicle_name: vehicle.vehicle_name,
+        registration_number: vehicle.registration_number,
+      };
+
+      finalData.push(formatted);
+    }
+
+    return res.status(200).json({
       success: true,
-      message: "Booking retrived successfully.",
-      data: result.rows,
+      message:
+        user?.role === "admin"
+          ? "Bookings retrieved successfully"
+          : "Your bookings retrieved successfully",
+      data: finalData,
     });
   } catch (err: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message,
-      details: err,
     });
   }
 };
 
 const updateBooking = async (req: Request, res: Response) => {
-  //   console.log(req.params.bookingId);
   try {
     const data = await bookingServices.updateBooking(
       req.params.bookingId!,
