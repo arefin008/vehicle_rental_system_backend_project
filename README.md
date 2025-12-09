@@ -6,7 +6,7 @@ This API handles authentication, vehicles, users, and bookings with full role-ba
 Live Deployment: \
 [GitHub Repository] (https://github.com/arefin008/vehicle_rental_system_backend_project) 
 
-## 📌Features
+## Features
 
 - Authentication
 
