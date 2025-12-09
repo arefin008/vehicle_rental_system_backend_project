@@ -5,11 +5,21 @@ import config from "../config";
 const auth = (...roles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = req.headers.authorization;
+      const authHeader = req.headers.authorization;
 
-      if (!token) {
-        return res.status(500).json({
-          message: "You are not allowed!!",
+      if (!authHeader) {
+        return res.status(401).json({
+          success: false,
+          message: "No token provided",
+        });
+      }
+
+      const [bearer, token] = authHeader.split(" ");
+
+      if (bearer !== "Bearer" || !token) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid token format",
         });
       }
 
@@ -20,16 +30,19 @@ const auth = (...roles: string[]) => {
       console.log(decoded);
       req.user = decoded;
 
-      if (roles.length && !roles.includes(decoded.role as string)) {
-        return res.status(500).json({
-          error: "unauthorized!!!",
+      // Role check
+      if (roles.length && !roles.includes(decoded.role)) {
+        return res.status(403).json({
+          success: false,
+          message: "You do not have permission!",
         });
       }
+
       next();
     } catch (err: any) {
-      res.status(500).json({
+      return res.status(401).json({
         success: false,
-        message: err.message,
+        message: "invalid token",
       });
     }
   };
