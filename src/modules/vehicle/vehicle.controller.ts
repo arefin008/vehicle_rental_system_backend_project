@@ -45,12 +45,12 @@ const getAllVehicle = async (req: Request, res: Response) => {
 const getSingleVehicle = async (req: Request, res: Response) => {
   try {
     const result = await vehicleServices.getSingleVehicle(
-      req.params.id as string
+      req.params.vehicleId as string
     );
     if (result.rows.length === 0) {
       res.status(404).json({
         success: false,
-        message: "User Not found",
+        message: "Vehicle Not found",
       });
     } else {
       res.status(200).json({
@@ -82,7 +82,7 @@ const updateVehicle = async (req: Request, res: Response) => {
       registration_number,
       daily_rent_price,
       availability_status,
-      req.params.id!
+      req.params.vehicleId!
     );
     if (result.rows.length === 0) {
       res.status(404).json({
@@ -106,11 +106,19 @@ const updateVehicle = async (req: Request, res: Response) => {
 
 const deleteVehicle = async (req: Request, res: Response) => {
   try {
-    const result = await vehicleServices.deleteVehicle(req.params.id!);
-    if (result.rowCount === 0) {
-      res.status(400).json({
+    const { vehicleId } = req.params;
+    const isActive = await vehicleServices.checkActiveBookings(vehicleId!);
+    if (isActive) {
+      return res.status(400).json({
         success: false,
-        message: "User not found",
+        message: "Cannot delete Vehicle with active bookings",
+      });
+    }
+    const result = await vehicleServices.deleteVehicle(vehicleId!);
+    if ((result.rowCount ?? 0) === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Vehicle Not found",
       });
     } else {
       res.status(200).json({
